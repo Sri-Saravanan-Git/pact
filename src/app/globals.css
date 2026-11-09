@@ -546,6 +546,17 @@
   animation: lb-swell 14s ease-in-out infinite;
 }
 
+/* phones: smaller blur radius keeps the GPU cool while the look stays the same */
+@media (max-width: 640px) {
+  .lb-glow {
+    filter: blur(70px) !important;
+  }
+  .ambient::before,
+  .ambient::after {
+    filter: blur(70px);
+  }
+}
+
 /* the light pages breathe too, more quietly */
 .ambient::before,
 .ambient::after {

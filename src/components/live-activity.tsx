@@ -34,7 +34,7 @@ export function LiveActivity({ limit = 5 }: { limit?: number }) {
           </span>
           Live from the PayPal sandbox
         </p>
-        <Link href="/board" className="t-small font-medium text-blue hover:underline">
+        <Link href="/board" className="t-small -my-2 -mr-2 inline-flex min-h-10 items-center rounded-full px-3 font-medium text-blue hover:bg-mist">
           Open board
         </Link>
       </div>

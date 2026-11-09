@@ -2,7 +2,8 @@
 "use no memo";
 /* eslint-disable react-hooks/immutability -- three.js objects are mutated every frame by design */
 import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import type { MotionValue } from "motion/react";
@@ -109,7 +110,7 @@ function ParcelMesh({ p, i, progress }: { p: Parcel; i: number; progress: Motion
 
   return (
     <group ref={ref}>
-      <RoundedBox args={[1.8, 0.9, 1.1]} radius={0.08} smoothness={3} castShadow>
+      <RoundedBox args={[1.8, 0.9, 1.1]} radius={0.08} smoothness={3}>
         <meshStandardMaterial ref={body} color={C.slab} roughness={0.7} />
       </RoundedBox>
       <mesh position={[0, 0.02, 0.556]}>
@@ -135,7 +136,7 @@ function Belt({ progress }: { progress: MotionValue<number> }) {
   });
   return (
     <group>
-      <mesh position={[0, -0.05, 0]} receiveShadow>
+      <mesh position={[0, -0.05, 0]}>
         <boxGeometry args={[22, 0.1, 1.6]} />
         <meshStandardMaterial map={tex} roughness={0.9} />
       </mesh>
@@ -156,17 +157,17 @@ function Scanner() {
   return (
     <group position={[SCAN_X, 0, 0]}>
       {/* open tunnel: solid back wall, two slim front posts, so the camera sees inside */}
-      <mesh position={[0, 1.1, -1.05]} castShadow>
+      <mesh position={[0, 1.1, -1.05]}>
         <boxGeometry args={[1.6, 2.4, 0.3]} />
         <meshStandardMaterial color={C.frame} roughness={0.35} />
       </mesh>
       {[-0.72, 0.72].map((x) => (
-        <mesh key={x} position={[x, 1.1, 1.05]} castShadow>
+        <mesh key={x} position={[x, 1.1, 1.05]}>
           <boxGeometry args={[0.16, 2.4, 0.3]} />
           <meshStandardMaterial color={C.frame} roughness={0.35} />
         </mesh>
       ))}
-      <mesh position={[0, 2.4, 0]} castShadow>
+      <mesh position={[0, 2.4, 0]}>
         <boxGeometry args={[1.6, 0.4, 2.4]} />
         <meshStandardMaterial color={C.frame} roughness={0.35} />
       </mesh>
@@ -199,28 +200,32 @@ function Bin() {
   );
 }
 
+/** Render on demand: a frame only when the scroll position changes, nothing while idle or off screen. */
+function RenderOnScroll({ progress }: { progress: MotionValue<number> }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => progress.on("change", () => invalidate()), [progress, invalidate]);
+  return null;
+}
+
 export default function XrayScene({ parcels, progress }: { parcels: Parcel[]; progress: MotionValue<number> }) {
   return (
     <Canvas
-      shadows
-      dpr={[1, 1.75]}
+      frameloop="demand"
+      dpr={typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 1.5]}
       camera={{ position: [1.2, 4.6, 10.5], fov: 32 }}
       onCreated={({ camera }) => camera.lookAt(0.6, 0.3, 0.9)}
       gl={{ antialias: true, alpha: true }}
       aria-hidden
     >
       <ambientLight intensity={0.9} />
-      <directionalLight position={[4, 9, 6]} intensity={2.1} castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[4, 9, 6]} intensity={2.1} />
+      <RenderOnScroll progress={progress} />
       <Belt progress={progress} />
       <Scanner />
       <Bin />
       {parcels.map((p, i) => (
         <ParcelMesh key={p.seller} p={p} i={i} progress={progress} />
       ))}
-      <mesh rotation-x={-Math.PI / 2} position={[0, -0.92, 0]} receiveShadow>
-        <planeGeometry args={[40, 20]} />
-        <shadowMaterial opacity={0.18} />
-      </mesh>
     </Canvas>
   );
 }

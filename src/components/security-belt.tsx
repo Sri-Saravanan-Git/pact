@@ -25,7 +25,7 @@ export function SecurityBelt() {
   useMotionValueEvent(scrollYProgress, "change", (v) => setStep(Math.min(3, Math.floor(v * 4.2))));
 
   return (
-    <section ref={ref} aria-labelledby="security-h" className="relative" style={{ height: still ? "auto" : "300vh" }}>
+    <section ref={ref} aria-labelledby="security-h" className={`relative ${still ? "" : "h-[230vh] md:h-[300vh]"}`}>
       <div className={`${still ? "" : "sticky top-16 h-[calc(100dvh-4rem)]"} overflow-hidden`}>
         <div className="wrap grid h-full items-center gap-8 py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <div className="relative z-10">
