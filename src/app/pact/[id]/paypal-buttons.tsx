@@ -39,7 +39,7 @@ export function PayPalButtons({ createOrder, onApproved, onError }: { createOrde
       .then((pp) => {
         if (closed || !box.current) return;
         inst = pp.Buttons({
-          style: { layout: "horizontal", color: "black", shape: "rect", label: "paypal", height: 48, tagline: false },
+          style: { layout: "horizontal", color: "blue", shape: "pill", label: "paypal", height: 48, tagline: false },
           createOrder,
           onApprove: (d) => onApproved(d.orderID),
           onError: () => onError("PayPal reported a problem. Try again, or use the sandbox test card."),
@@ -56,8 +56,8 @@ export function PayPalButtons({ createOrder, onApproved, onError }: { createOrde
 
   return (
     <div>
-      {!ready && <div className="h-12 animate-pulse bg-concrete-2" aria-label="Loading PayPal" />}
-      <div ref={box} className="max-w-[360px]" />
+      {!ready && <div className="h-12 animate-pulse rounded-full bg-canvas" aria-label="Loading PayPal" />}
+      <div ref={box} className="w-full" />
     </div>
   );
 }

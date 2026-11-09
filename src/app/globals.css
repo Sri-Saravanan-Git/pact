@@ -1,73 +1,140 @@
 @import "tailwindcss";
 
-/* Terminal wayfinding: concrete ground, black boards, signage yellow, FIDS status colours. Nothing else. */
+/*
+  Pact design tokens — blue & white.
+  Navy carries trust and text, one saturated blue carries every action,
+  white surfaces sit on a cool canvas. Status colours only ever mean status.
+*/
 @theme {
-  --color-concrete: #e3e4df;
-  --color-concrete-2: #d6d8d1;
-  --color-slab: #eff0ec;
-  --color-ink: #141516;
-  --color-ink-2: #4a4d50;
-  --color-board: #121314;
-  --color-flap: #1d1e20;
-  --color-flap-ink: #f4f1e8;
-  --color-flap-dim: #9a988f;
-  --color-sign: #ffc72c;
-  --color-sign-ink: #1a1400;
-  --color-held: #ff9f1c;
-  --color-paid: #2fbf71;
-  --color-stop: #e5484d;
-  --color-check: #5aa0ff;
-  --color-hair: #b9bbb4;
+  --color-canvas: #f4f7fc;
+  --color-surface: #ffffff;
+  --color-mist: #eaf2ff;
+  --color-mist-2: #d6e6ff;
+  --color-line: #e2e8f2;
+  --color-line-2: #cfd8e6;
 
-  --font-body: var(--nf-body), system-ui, sans-serif;
-  --font-sign: var(--nf-sign), var(--nf-body), sans-serif;
-  --font-flap: var(--nf-flap), ui-monospace, monospace;
+  --color-navy: #071d49;
+  --color-navy-2: #0b2a63;
+  --color-ink: #0b1a33;
+  --color-ink-2: #46546e;
+  --color-ink-3: #6b7890;
 
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --color-blue: #0b63f6;
+  --color-blue-press: #0a52cc;
+  --color-sky: #3aa0ff;
+
+  --color-paid: #0f9f62;
+  --color-paid-soft: #e3f7ee;
+  --color-held: #c46a00;
+  --color-held-soft: #fff3e0;
+  --color-stop: #d92d3a;
+  --color-stop-soft: #fdecee;
+  --color-check: #0b63f6;
+  --color-check-soft: #eaf2ff;
+
+  --font-sans: var(--nf-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--nf-mono), ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --shadow-card: 0 1px 2px rgb(11 26 51 / 0.04), 0 4px 16px -4px rgb(11 26 51 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(11 26 51 / 0.04), 0 24px 48px -16px rgb(7 29 73 / 0.22);
+  --shadow-blue: 0 1px 2px rgb(11 99 246 / 0.25), 0 8px 20px -6px rgb(11 99 246 / 0.45);
+}
+
+/* Type system: 16px base, ~1.25 ratio. Tracking tightens as size grows; leading tightens too. */
+@utility t-display {
+  font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+}
+@utility t-h1 {
+  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 650;
+}
+@utility t-h2 {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 650;
+}
+@utility t-h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.012em;
+  font-weight: 600;
+}
+@utility t-lead {
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+@utility t-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+@utility t-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+@utility t-micro {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+@utility t-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 @layer base {
   html {
-    background: var(--color-concrete);
+    background: var(--color-canvas);
     color: var(--color-ink);
-    font-family: var(--font-body);
-    font-size: 17px;
-    line-height: 1.55;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    scrollbar-color: var(--color-ink-2) var(--color-concrete-2);
+    -moz-osx-font-smoothing: grayscale;
+    scrollbar-color: var(--color-line-2) transparent;
   }
   body {
     min-height: 100dvh;
   }
   ::selection {
-    background: var(--color-sign);
-    color: var(--color-sign-ink);
+    background: var(--color-mist-2);
+    color: var(--color-navy);
   }
   :focus-visible {
-    outline: 3px solid var(--color-sign);
+    outline: 2px solid var(--color-blue);
     outline-offset: 3px;
+    border-radius: 8px;
   }
-  .on-sign :focus-visible {
-    outline-color: var(--color-ink);
+  .on-blue :focus-visible {
+    outline-color: #fff;
   }
   a {
-    text-underline-offset: 0.22em;
+    text-underline-offset: 0.2em;
     text-decoration-thickness: 1px;
   }
   h1,
   h2,
   h3 {
-    font-family: var(--font-sign);
     text-wrap: balance;
-    letter-spacing: -0.01em;
-    line-height: 0.98;
   }
   p {
     text-wrap: pretty;
   }
   input,
   textarea {
-    caret-color: var(--color-ink);
+    caret-color: var(--color-blue);
   }
 }
 
@@ -77,188 +144,151 @@
     left: 1rem;
     top: -4rem;
     z-index: 100;
-    background: var(--color-sign);
-    color: var(--color-sign-ink);
+    background: var(--color-blue);
+    color: #fff;
     padding: 0.6rem 1rem;
+    border-radius: 10px;
     font-weight: 600;
   }
   .skip:focus {
     top: 1rem;
   }
   .wrap {
-    width: min(1240px, 100% - 32px);
+    width: min(1200px, 100% - 32px);
     margin-inline: auto;
   }
-  .num {
-    font-family: var(--font-flap);
-    font-variant-numeric: tabular-nums;
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
   }
-  .sign-label {
-    font-family: var(--font-sign);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.78rem;
-  }
+
+  /* Buttons respond on press, instantly; colour eases, scale is quick. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
-    min-height: 3rem;
-    padding: 0 1.4rem;
-    font-family: var(--font-sign);
-    font-weight: 700;
-    font-size: 1.05rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    border: 2px solid var(--color-ink);
-    transition:
-      background-color 0.2s var(--ease-out-expo),
-      color 0.2s var(--ease-out-expo),
-      border-color 0.2s var(--ease-out-expo),
-      transform 0.2s var(--ease-out-expo);
+    gap: 0.5rem;
+    min-height: 2.875rem;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
     cursor: pointer;
+    user-select: none;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease,
+      border-color 200ms ease;
   }
   .btn:active:not(:disabled) {
-    transform: translateY(1px);
+    transform: scale(0.97);
   }
   .btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
   }
-  .btn-ink {
-    background: var(--color-ink);
-    color: var(--color-flap-ink);
+  .btn-primary {
+    background: var(--color-blue);
+    color: #fff;
+    box-shadow: var(--shadow-blue);
   }
-  .btn-ink:hover:not(:disabled) {
-    background: #000;
-    color: var(--color-sign);
+  .btn-primary:active:not(:disabled) {
+    background: var(--color-blue-press);
   }
-  .btn-line {
-    background: transparent;
-    color: var(--color-ink);
+  .btn-ghost {
+    background: var(--color-surface);
+    color: var(--color-navy);
+    box-shadow: inset 0 0 0 1px var(--color-line-2);
   }
-  .btn-line:hover:not(:disabled) {
-    background: var(--color-ink);
-    color: var(--color-flap-ink);
+  .btn-white {
+    background: #fff;
+    color: var(--color-navy);
   }
-  .btn-sign {
-    background: var(--color-sign);
-    color: var(--color-sign-ink);
-    border-color: var(--color-sign);
-  }
-  .btn-sign:hover:not(:disabled) {
-    background: var(--color-flap-ink);
-    border-color: var(--color-flap-ink);
+  .btn-on-blue {
+    background: rgb(255 255 255 / 0.12);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
   }
   .btn-sm {
-    min-height: 2.4rem;
-    padding: 0 1rem;
-    font-size: 0.9rem;
+    min-height: 2.25rem;
+    padding: 0 0.9rem;
+    font-size: 0.875rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled) {
+      background: var(--color-blue-press);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      box-shadow: inset 0 0 0 1px var(--color-blue);
+      color: var(--color-blue);
+    }
+    .btn-on-blue:hover:not(:disabled) {
+      background: rgb(255 255 255 / 0.2);
+    }
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 1.5rem;
+    padding: 0 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
   }
 }
 
-/* Split-flap: two static halves plus two animated leaves, in real 3D. */
-.flap {
-  position: relative;
-  display: inline-block;
-  width: 0.92em;
-  height: 1.5em;
-  margin-right: 0.08em;
-  perspective: 6em;
-  font-family: var(--font-flap);
-  font-weight: 700;
-  color: inherit;
-  line-height: 1.5em;
-  text-align: center;
-  vertical-align: middle;
+/* Status pill crossfades through a short blur so two states never visibly overlap. */
+.swap {
+  animation: swap-in 260ms var(--ease-out);
 }
-.flap > span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 50%;
-  overflow: hidden;
-  background: var(--color-flap);
-  backface-visibility: hidden;
-}
-.flap > span > i {
-  font-style: normal;
-  display: block;
-  height: 1.5em;
-}
-.flap .t {
-  top: 0;
-  border-radius: 0.1em 0.1em 0 0;
-  transform-origin: 50% 100%;
-}
-.flap .b {
-  bottom: 0;
-  border-radius: 0 0 0.1em 0.1em;
-  transform-origin: 50% 0%;
-}
-.flap .b > i {
-  transform: translateY(-50%);
-}
-.flap::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(50% - 0.5px);
-  height: 1px;
-  background: #000;
-  z-index: 5;
-}
-.flap .ft {
-  animation: leaf-top var(--flap-ms, 60ms) ease-in forwards;
-  z-index: 3;
-  background: #26272a;
-}
-.flap .fb {
-  animation: leaf-bottom var(--flap-ms, 60ms) ease-out var(--flap-ms, 60ms) both;
-  z-index: 4;
-}
-@keyframes leaf-top {
-  to {
-    transform: rotateX(-90deg);
-  }
-}
-@keyframes leaf-bottom {
+@keyframes swap-in {
   from {
-    transform: rotateX(90deg);
-  }
-  to {
-    transform: rotateX(0deg);
+    opacity: 0.4;
+    filter: blur(3px);
+    transform: translateY(2px);
   }
 }
 
-@keyframes now-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
+/* Entrances: from already-near the final state, never from nothing. */
+.rise {
+  animation: rise 520ms var(--ease-out) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
 }
-.now-light {
-  animation: now-pulse 1.4s ease-in-out infinite;
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(11 99 246 / 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgb(11 99 246 / 0);
+  }
+}
+.pulse {
+  animation: pulse-ring 1.6s var(--ease-out) infinite;
 }
 
 @keyframes belt {
   from {
-    left: -4px;
+    transform: translateX(-100%);
   }
   to {
-    left: 100%;
+    transform: translateX(400%);
   }
-}
-
-/* AG Grid board skin */
-.board-grid {
-  --ag-font-family: var(--font-flap);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -269,5 +299,11 @@
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: #fff !important;
+    backdrop-filter: none !important;
   }
 }

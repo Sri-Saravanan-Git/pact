@@ -9,6 +9,7 @@ function init() {
   ready ??= Promise.all([
     sql`create table if not exists pacts (id text primary key, data jsonb not null, updated_at timestamptz not null default now())`,
     sql`create table if not exists files (id text primary key, pact_id text not null, name text not null, mime text not null, b64 text not null, created_at timestamptz not null default now())`,
+    sql`create table if not exists ai_cache (key text primary key, value jsonb not null, created_at timestamptz not null default now())`,
   ]);
   return ready;
 }
@@ -45,6 +46,17 @@ export async function pactsCreatedToday(): Promise<number> {
   await init();
   const rows = await sql`select count(*)::int as n from pacts where (data->>'createdAt')::timestamptz > now() - interval '1 day'`;
   return rows[0].n as number;
+}
+
+export async function cacheGet(key: string): Promise<unknown | null> {
+  await init();
+  const rows = await sql`select value from ai_cache where key = ${key}`;
+  return rows[0]?.value ?? null;
+}
+
+export async function cachePut(key: string, value: unknown) {
+  await init();
+  await sql`insert into ai_cache (key, value) values (${key}, ${JSON.stringify(value)}) on conflict (key) do nothing`;
 }
 
 export async function saveFile(f: { id: string; pactId: string; name: string; mime: string; bytes: Buffer }) {

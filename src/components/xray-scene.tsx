@@ -8,19 +8,19 @@ import * as THREE from "three";
 import type { MotionValue } from "motion/react";
 
 const C = {
-  board: "#121314",
-  ink: "#141516",
-  slab: "#eff0ec",
-  sign: "#ffc72c",
-  stop: "#e5484d",
-  paid: "#2fbf71",
-  check: "#5aa0ff",
+  belt: "#0b2a63",
+  ink: "#071d49",
+  slab: "#ffffff",
+  blue: "#0b63f6",
+  stop: "#d92d3a",
+  check: "#3aa0ff",
+  frame: "#e9eef7",
 };
 
 export type Parcel = { seller: string; price: string; bad?: boolean };
 
 function flapFont() {
-  const v = getComputedStyle(document.documentElement).getPropertyValue("--nf-flap").trim();
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--nf-mono").trim();
   return v || "monospace";
 }
 
@@ -31,11 +31,12 @@ function labelTexture(p: Parcel) {
   const g = c.getContext("2d")!;
   g.fillStyle = C.slab;
   g.fillRect(0, 0, 512, 256);
-  g.fillStyle = C.sign;
+  g.fillStyle = C.blue;
   g.fillRect(0, 0, 512, 56);
+  g.fillStyle = "#fff";
+  g.font = `600 28px ${flapFont()}`;
+  g.fillText("LISTING", 24, 38);
   g.fillStyle = C.ink;
-  g.font = `700 30px ${flapFont()}`;
-  g.fillText("LISTING", 24, 39);
   g.font = `700 46px ${flapFont()}`;
   g.fillText(p.seller.toUpperCase().slice(0, 15), 24, 130);
   g.font = `400 40px ${flapFont()}`;
@@ -125,7 +126,7 @@ function ParcelMesh({ p, i, progress }: { p: Parcel; i: number; progress: Motion
 
 function Belt({ progress }: { progress: MotionValue<number> }) {
   const tex = useMemo(() => {
-    const t = stripes("#1d1e20", "#26272a", 10);
+    const t = stripes("#0b2a63", "#0f3473", 10);
     t.repeat.set(8, 1);
     return t;
   }, []);
@@ -148,7 +149,7 @@ function Belt({ progress }: { progress: MotionValue<number> }) {
 
 function Scanner() {
   const hazard = useMemo(() => {
-    const t = stripes(C.sign, C.ink, 6);
+    const t = stripes(C.blue, "#ffffff", 6);
     t.repeat.set(2, 1);
     return t;
   }, []);
@@ -157,17 +158,17 @@ function Scanner() {
       {/* open tunnel: solid back wall, two slim front posts, so the camera sees inside */}
       <mesh position={[0, 1.1, -1.05]} castShadow>
         <boxGeometry args={[1.6, 2.4, 0.3]} />
-        <meshStandardMaterial color={C.ink} roughness={0.5} />
+        <meshStandardMaterial color={C.frame} roughness={0.35} />
       </mesh>
       {[-0.72, 0.72].map((x) => (
         <mesh key={x} position={[x, 1.1, 1.05]} castShadow>
           <boxGeometry args={[0.16, 2.4, 0.3]} />
-          <meshStandardMaterial color={C.ink} roughness={0.5} />
+          <meshStandardMaterial color={C.frame} roughness={0.35} />
         </mesh>
       ))}
       <mesh position={[0, 2.4, 0]} castShadow>
         <boxGeometry args={[1.6, 0.4, 2.4]} />
-        <meshStandardMaterial color={C.ink} roughness={0.5} />
+        <meshStandardMaterial color={C.frame} roughness={0.35} />
       </mesh>
       <mesh position={[0, 2.4, 1.21]}>
         <boxGeometry args={[1.6, 0.4, 0.02]} />
@@ -184,7 +185,7 @@ function Scanner() {
 
 function Bin() {
   const hazard = useMemo(() => {
-    const t = stripes(C.sign, C.ink, 8);
+    const t = stripes(C.stop, "#ffffff", 8);
     t.repeat.set(3, 1);
     return t;
   }, []);

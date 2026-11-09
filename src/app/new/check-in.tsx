@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SplitFlap } from "@/components/split-flap";
+import { GATES } from "@/lib/ui";
 
 const SAMPLE = "Get me a logo for my bakery, Saffron Crumb. Budget $150. I need SVG files in 3 colour variants and a transparent PNG, done in 2 days.";
 const PRESETS = [
@@ -41,77 +41,83 @@ export function CheckIn() {
   }, [sample]);
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] bg-concrete">
-      <div className="bg-board py-6 text-flap-ink">
-        <div className="wrap flex flex-wrap items-center justify-between gap-4 text-[clamp(13px,1.6vw,20px)]">
-          <SplitFlap text="CHECK-IN" length={8} className="text-sign" />
-          <SplitFlap text={busy ? "WRITING MANDATE" : "DESK OPEN"} length={15} />
-        </div>
-      </div>
-
-      <div className="wrap grid gap-12 py-14 lg:grid-cols-[7fr_5fr]">
+    <div className="min-h-[calc(100dvh-4rem)] bg-[radial-gradient(70%_50%_at_50%_0%,#e6f0ff_0%,transparent_70%)]">
+      <div className="wrap grid gap-10 py-14 lg:grid-cols-[1.35fr_1fr] lg:py-20">
         <form
+          className="rise"
           onSubmit={(e) => {
             e.preventDefault();
             submit(text);
           }}
         >
-          <h1 className="mb-3 text-[clamp(2.4rem,5vw,4.2rem)] font-extrabold uppercase">What should your agent get done?</h1>
-          <p className="mb-8 max-w-[52ch] text-[1.08rem] text-ink-2">
-            Say it the way you would to a person. Include a budget and a deadline. Pact turns it into limits the agent cannot cross.
-          </p>
-          <label htmlFor="req" className="sign-label mb-2 block">
-            Your request
-          </label>
-          <textarea
-            id="req"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={5}
-            maxLength={600}
-            disabled={busy}
-            className="block w-full resize-y border-[3px] border-ink bg-slab p-4 text-[1.15rem] leading-relaxed outline-none focus:bg-white"
-          />
-          <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Example requests">
-            {PRESETS.map((p) => (
-              <button key={p.label} type="button" disabled={busy} onClick={() => setText(p.text)} className={`btn btn-sm ${text === p.text ? "btn-ink" : "btn-line"}`}>
-                {p.label}
+          <h1 className="t-h1 text-navy">What should your agent get done?</h1>
+          <p className="t-lead mt-4 max-w-[50ch] text-ink-2">Say it the way you would to a person. Include a budget and a deadline. Pact turns it into limits the agent cannot cross.</p>
+
+          <div className="card mt-8 overflow-hidden focus-within:ring-2 focus-within:ring-blue/30">
+            <label htmlFor="req" className="sr-only">
+              Your request
+            </label>
+            <textarea
+              id="req"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={4}
+              maxLength={600}
+              disabled={busy}
+              className="block w-full resize-none bg-transparent px-6 pt-5 pb-2 text-[1.125rem] leading-relaxed text-ink outline-none placeholder:text-ink-3 disabled:opacity-60"
+              placeholder="e.g. A logo for my bakery, under $150, in 2 days…"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Example requests">
+                {PRESETS.map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setText(p.text)}
+                    aria-pressed={text === p.text}
+                    className={`chip h-8 cursor-pointer px-3 transition-colors duration-200 ${text === p.text ? "bg-navy text-white" : "bg-canvas text-ink-2 hover:bg-mist hover:text-navy"}`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <button type="submit" disabled={busy || text.trim().length < 10} className="btn btn-primary">
+                {busy ? (
+                  <>
+                    <span aria-hidden className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                    Writing your mandate
+                  </>
+                ) : (
+                  "Start the pact"
+                )}
               </button>
-            ))}
+            </div>
           </div>
+
           {error && (
-            <p role="alert" className="mt-5 border-[3px] border-stop bg-white px-4 py-3 font-medium">
+            <p role="alert" className="swap t-small mt-4 rounded-xl border border-stop/20 bg-stop-soft px-4 py-3 font-medium text-stop">
               {error}
             </p>
           )}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button type="submit" disabled={busy || text.trim().length < 10} className="btn btn-ink">
-              {busy ? "Writing your mandate…" : "Check in and start"}
-            </button>
-            <p className="text-[0.95rem] text-ink-2">{busy ? "The AI is reading your request. About 5 seconds." : "Demo marketplace stocks logo design."}</p>
-          </div>
+          <p className="t-small mt-4 text-ink-3">{busy ? "The AI is reading your request. About 5 seconds." : "The demo marketplace stocks logo design. PayPal sandbox only."}</p>
         </form>
 
-        <aside className="self-start bg-board p-6 text-flap-ink">
-          <h2 className="mb-4 text-[1.5rem] font-extrabold uppercase text-sign">What happens next</h2>
-          <ol className="space-y-4">
-            {[
-              ["Mandate", "Budget, deadline and deliverables become hard limits."],
-              ["Security", "Every seller listing is screened before the agent reads it."],
-              ["Promises", "You approve exactly what will be checked."],
-              ["Hold", "PayPal holds the money. Nothing is paid yet."],
-              ["Inspection", "Delivered files are checked promise by promise."],
-              ["Release", "You release the payment, or void the hold."],
-            ].map(([k, v], i) => (
-              <li key={k} className="grid grid-cols-[2.4rem_1fr] gap-2">
-                <span className="num text-sign">G{i + 1}</span>
-                <span>
-                  <strong className="font-sign text-[1.1rem] font-bold uppercase">{k}</strong>
-                  <span className="block text-[0.95rem] text-flap-dim">{v}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
+        <aside className="rise self-start [animation-delay:100ms]">
+          <div className="card p-6">
+            <h2 className="text-[1rem] font-semibold text-navy">What happens next</h2>
+            <ol className="mt-4 space-y-4">
+              {GATES.map((g, i) => (
+                <li key={g.key} className="grid grid-cols-[1.75rem_1fr] gap-3">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-mist text-[0.72rem] font-semibold text-blue">{i + 1}</span>
+                  <span>
+                    <span className="t-small block font-semibold text-navy">{g.name}</span>
+                    <span className="t-small block text-ink-2">{g.line}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </aside>
       </div>
     </div>

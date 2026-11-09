@@ -1,133 +1,170 @@
 import Link from "next/link";
-import { DepartureBoard } from "@/components/departure-board";
+import { PactCard } from "@/components/pact-card";
+import { LiveActivity } from "@/components/live-activity";
 import { SecurityBelt } from "@/components/security-belt";
-import { GatesRoute } from "@/components/gates-route";
+import { HowItWorks } from "@/components/how-it-works";
+import { Wordmark } from "@/components/nav";
 
 const CALLS = [
-  { verb: "POST", path: "/v2/checkout/orders", note: "intent AUTHORIZE · payee = freelancer", out: "HELD", color: "var(--color-held)" },
-  { verb: "POST", path: "/v2/payments/authorizations/{id}/capture", note: "only after inspection + your OK", out: "PAID", color: "var(--color-paid)" },
-  { verb: "POST", path: "/v2/payments/authorizations/{id}/void", note: "deadline missed, or you cancel", out: "VOIDED", color: "var(--color-flap-dim)" },
+  { path: "/v2/checkout/orders", note: "intent AUTHORIZE · payee = freelancer", out: "On hold", tone: "bg-held-soft text-held" },
+  { path: "/v2/payments/authorizations/{id}/capture", note: "only after inspection and your OK", out: "Paid", tone: "bg-paid-soft text-paid" },
+  { path: "/v2/payments/authorizations/{id}/void", note: "deadline missed, or you cancel", out: "Voided", tone: "bg-white/10 text-white/80" },
 ];
 
 const LADDER = [
-  { who: "Code", does: "Budget, deadline, category, file format, transparency, size, file count. Anything a rule can decide, a rule decides." },
-  { who: "AI", does: "Reads your request, picks the offer that fits, writes the promises, judges what only eyes can judge. It advises." },
-  { who: "You", does: "Approve the promises. Release the money or void the hold. A failed check never moves money on its own." },
+  { who: "Code", tag: "Decides first", does: "Budget, deadline, category, file format, real transparency, pixel size, file count. Anything a rule can decide, a rule decides." },
+  { who: "AI", tag: "Advises", does: "Reads your request, picks the offer that fits, writes the promises, and judges only what needs eyes." },
+  { who: "You", tag: "Decide last", does: "Approve the promises. Release the money, or void the hold. A failed check never moves money on its own." },
 ];
 
 export default function Home() {
   return (
     <>
-      <section aria-labelledby="hero-h" className="relative">
-        <DepartureBoard />
-        <div className="wrap relative">
-          <div className="on-sign relative z-10 -mt-12 grid gap-6 bg-sign px-6 py-8 text-sign-ink sm:-mt-16 sm:px-10 sm:py-10 lg:grid-cols-[7fr_5fr] lg:items-end lg:gap-12">
-            <h1 id="hero-h" className="text-[clamp(2.6rem,5.2vw,4.7rem)] font-extrabold uppercase">
-              Money that moves only when the promise is proven.
+      {/* HERO: the mechanism, shown, not described */}
+      <section aria-labelledby="hero-h" className="relative overflow-hidden bg-white">
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_55%_at_78%_35%,#e6f0ff_0%,transparent_70%)]" />
+        <div className="wrap relative grid items-center gap-14 pt-14 pb-20 lg:grid-cols-[1.2fr_1fr] lg:pt-20 lg:pb-28">
+          <div className="rise">
+            <h1 id="hero-h" className="t-display text-navy">
+              Money that moves only when the promise is <span className="text-blue">proven.</span>
             </h1>
-            <div>
-            <p className="max-w-[46ch] text-[1.1rem] leading-relaxed">
+            <p className="t-lead mt-6 max-w-[48ch] text-ink-2">
               Tell Pact what you need. An AI agent buys it within limits it cannot break, PayPal holds the money, and the freelancer is paid the moment every promise checks out.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/new" className="btn btn-ink">
-                Start a pact
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/new?sample=1" className="btn btn-primary">
+                Run the sample pact
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+                  <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </Link>
-              <Link href="/new?sample=1" className="btn btn-line">
-                Run the sample flight
+              <Link href="/new" className="btn btn-ghost">
+                Write your own
               </Link>
             </div>
-            </div>
+            <p className="t-small mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-3">
+              <span>Built on PayPal Orders v2</span>
+              <span aria-hidden className="h-1 w-1 rounded-full bg-line-2" />
+              <span>AI by Gemini</span>
+              <span aria-hidden className="h-1 w-1 rounded-full bg-line-2" />
+              <span>Sandbox, about 3 minutes</span>
+            </p>
+          </div>
+          <div className="rise [animation-delay:120ms]">
+            <PactCard />
           </div>
         </div>
-        <div className="wrap grid gap-6 py-14 sm:grid-cols-3">
-          {[
-            ["Who", "Small businesses hiring freelancers, and anyone letting an AI agent spend for them."],
-            ["Problem", "You pay and hope, they deliver and hope, and an AI agent believes whatever a listing tells it."],
-            ["Pact", "Hard limits, held money, checked promises. Every step leaves a receipt with a real PayPal ID."],
-          ].map(([k, v]) => (
-            <div key={k} className="border-t-[3px] border-ink pt-3">
-              <h2 className="text-[1.5rem] font-extrabold uppercase">{k}</h2>
-              <p className="mt-1 max-w-[38ch] text-ink-2">{v}</p>
-            </div>
-          ))}
+      </section>
+
+      {/* WHO / PROBLEM, plus proof that it is live */}
+      <section aria-labelledby="why-h" className="border-y border-line bg-canvas py-20">
+        <div className="wrap grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+          <div>
+            <h2 id="why-h" className="t-h2 text-navy">
+              Paying for work is still a leap of faith. Letting an AI pay is a bigger one.
+            </h2>
+            <dl className="mt-8 space-y-5">
+              {[
+                ["For", "Small businesses hiring freelancers, and anyone letting an AI agent spend for them."],
+                ["The gap", "You pay and hope. They deliver and hope. And an AI agent believes whatever a listing tells it."],
+                ["Pact", "Hard limits, money held by PayPal, promises checked with evidence. Every step leaves a receipt."],
+              ].map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[5.5rem_1fr] gap-4">
+                  <dt className="t-small pt-0.5 font-semibold text-blue">{k}</dt>
+                  <dd className="t-body text-ink-2">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <LiveActivity />
         </div>
       </section>
 
       <SecurityBelt />
 
-      <section id="gates" aria-labelledby="gates-h" className="scroll-mt-16 border-t border-ink bg-slab py-24">
-        <div className="wrap">
-          <h2 id="gates-h" className="mb-3 max-w-[18ch] text-[clamp(2.4rem,5vw,4.4rem)] font-extrabold uppercase">
-            Six gates between your money and their work.
-          </h2>
-          <p className="mb-14 max-w-[56ch] text-[1.1rem] text-ink-2">Every pact passes the same gates in the same order. The board shows where each one stands, and nothing skips a gate.</p>
-          <GatesRoute />
+      <section id="how" aria-labelledby="how-h" className="scroll-mt-16 border-t border-line bg-canvas py-24">
+        <div className="wrap grid gap-14 lg:grid-cols-[1fr_1.2fr]">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <h2 id="how-h" className="t-h1 text-navy">
+              Six gates between your money and their work.
+            </h2>
+            <p className="t-lead mt-5 max-w-[42ch] text-ink-2">Every pact passes the same gates, in the same order. Nothing skips one, and each gate shows who decided.</p>
+            <Link href="/new?sample=1" className="btn btn-primary mt-8">
+              Walk through them
+            </Link>
+          </div>
+          <HowItWorks />
         </div>
       </section>
 
-      <section aria-labelledby="pp-h" className="bg-board py-24 text-flap-ink">
-        <div className="wrap grid gap-12 lg:grid-cols-[5fr_7fr]">
+      {/* PAYPAL: the money path, as API calls */}
+      <section aria-labelledby="pp-h" className="on-blue bg-navy py-24 text-white">
+        <div className="wrap grid gap-12 lg:grid-cols-[1fr_1.25fr] lg:items-center">
           <div>
-            <h2 id="pp-h" className="text-[clamp(2.2rem,4.4vw,3.8rem)] font-extrabold uppercase">
+            <h2 id="pp-h" className="t-h1">
               The money never touches Pact.
             </h2>
-            <p className="mt-5 max-w-[46ch] text-[1.08rem] text-flap-dim">
-              PayPal holds the authorization with the freelancer already named as payee. Pact only decides <strong className="font-semibold text-flap-ink">when</strong> to ask PayPal to capture or void. Three calls, every one recorded on the pact’s log.
+            <p className="t-lead mt-5 max-w-[44ch] text-white/70">
+              PayPal holds the authorization with the freelancer already named as payee. Pact only decides <strong className="font-semibold text-white">when</strong> to ask PayPal to capture or void, and logs every call.
             </p>
           </div>
-          <ul className="num divide-y divide-white/10 border-y border-white/10 text-[0.9rem]">
-            {CALLS.map((c) => (
-              <li key={c.path} className="grid gap-1 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6">
-                <div>
-                  <span className="text-sign">{c.verb}</span> <span className="break-all">{c.path}</span>
-                  <p className="mt-1 text-flap-dim">{c.note}</p>
+          <ul className="overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.04]">
+            {CALLS.map((c, i) => (
+              <li key={c.path} className={`grid gap-2 px-6 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 ${i ? "border-t border-white/10" : ""}`}>
+                <div className="min-w-0">
+                  <p className="t-num text-[0.88rem] break-all">
+                    <span className="mr-2 text-sky">POST</span>
+                    {c.path}
+                  </p>
+                  <p className="t-small mt-1 text-white/55">{c.note}</p>
                 </div>
-                <span className="font-bold tracking-[0.12em]" style={{ color: c.color }}>
-                  {c.out}
-                </span>
+                <span className={`chip justify-self-start ${c.tone}`}>{c.out}</span>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section aria-labelledby="ladder-h" className="py-24">
+      <section aria-labelledby="ladder-h" className="bg-white py-24">
         <div className="wrap">
-          <h2 id="ladder-h" className="mb-12 max-w-[20ch] text-[clamp(2.2rem,4.4vw,3.8rem)] font-extrabold uppercase">
+          <h2 id="ladder-h" className="t-h1 max-w-[18ch] text-navy">
             Code first. AI second. You decide.
           </h2>
-          <div className="grid border-t-[3px] border-ink md:grid-cols-3">
+          <ol className="mt-12 grid gap-4 md:grid-cols-3">
             {LADDER.map((l, i) => (
-              <div key={l.who} className={`py-6 md:px-6 ${i ? "border-t border-ink md:border-t-0 md:border-l" : "md:pl-0"}`}>
-                <h3 className="text-[2.6rem] font-extrabold uppercase">{l.who}</h3>
-                <p className="mt-2 max-w-[34ch] text-ink-2">{l.does}</p>
-              </div>
+              <li key={l.who} className="relative rounded-[20px] border border-line bg-canvas p-7">
+                <div className="flex items-baseline justify-between">
+                  <h3 className="text-[2.25rem] leading-none font-semibold tracking-[-0.03em] text-navy">{l.who}</h3>
+                  <span className="t-num text-[0.8rem] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+                </div>
+                <p className="t-small mt-2 font-semibold text-blue">{l.tag}</p>
+                <p className="t-body mt-3 text-ink-2">{l.does}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      <section aria-labelledby="go-h" className="on-sign bg-sign py-20 text-sign-ink">
+      <section aria-labelledby="go-h" className="on-blue bg-blue py-20 text-white">
         <div className="wrap flex flex-col justify-between gap-8 md:flex-row md:items-end">
-          <h2 id="go-h" className="max-w-[16ch] text-[clamp(2.4rem,5.2vw,4.6rem)] font-extrabold uppercase">
-            Board the sample flight. Three minutes, sandbox money.
+          <h2 id="go-h" className="t-h1 max-w-[16ch]">
+            See a promise proven in three minutes.
           </h2>
           <div className="flex flex-wrap gap-3">
-            <Link href="/new?sample=1" className="btn btn-ink">
-              Run the sample flight
+            <Link href="/new?sample=1" className="btn btn-white">
+              Run the sample pact
             </Link>
-            <Link href="/board" className="btn btn-line">
-              See the board
+            <Link href="/board" className="btn btn-on-blue">
+              Open the board
             </Link>
           </div>
         </div>
       </section>
 
-      <footer className="bg-board py-10 text-flap-dim">
-        <div className="wrap flex flex-col justify-between gap-3 text-[0.9rem] sm:flex-row">
-          <p>PayPal sandbox demo. No real money moves.</p>
-          <p>PayPal Orders v2 · Gemini · Next.js</p>
+      <footer className="bg-white py-10">
+        <div className="wrap flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <Wordmark />
+          <p className="t-small text-ink-3">PayPal sandbox demo. No real money moves. Built with PayPal Orders v2 and Gemini.</p>
         </div>
       </footer>
     </>

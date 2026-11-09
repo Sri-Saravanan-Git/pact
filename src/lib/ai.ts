@@ -1,35 +1,58 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { GoogleGenAI, type Part } from "@google/genai";
+import { cacheGet, cachePut } from "./db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-export const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+
+// Free-tier quotas are per model, so a chain of models multiplies headroom.
+// Lite first: fastest and the largest daily quota; full Flash models back it up.
+export const MODELS = (process.env.GEMINI_MODELS || "gemini-3.5-flash-lite,gemini-3.5-flash,gemini-3.6-flash").split(",").map((m) => m.trim());
 
 export class AIBusy extends Error {}
 
-/** Ask Gemini for JSON matching `schema`. Throws AIBusy on rate limit / timeout so the UI can say "try again". */
-export async function askJSON<T>(system: string, parts: (string | Part)[], schema: object, retry = true): Promise<T> {
-  try {
-    const res = await ai.models.generateContent({
-      model: MODEL,
-      contents: [{ role: "user", parts: parts.map((p) => (typeof p === "string" ? { text: p } : p)) }],
-      config: {
-        systemInstruction: system,
-        responseMimeType: "application/json",
-        responseJsonSchema: schema,
-        temperature: 0.2,
-        httpOptions: { timeout: 45_000 },
-      },
-    });
-    return JSON.parse(res.text ?? "") as T;
-  } catch (e) {
-    const msg = String((e as Error)?.message ?? e);
-    console.error("[ai]", msg.slice(0, 500));
-    if (/429|RESOURCE_EXHAUSTED|timeout|aborted|503|UNAVAILABLE|overloaded/i.test(msg)) {
-      // Free tier rate limits are per minute: wait what Google asks (max 20s) and try once more.
-      const wait = Math.min(Number(msg.match(/retry(?:Delay)?\D{0,12}(\d+(?:\.\d+)?)s/i)?.[1] ?? 8), 20);
-      if (retry) return new Promise((ok) => setTimeout(ok, wait * 1000)).then(() => askJSON<T>(system, parts, schema, false));
-      throw new AIBusy("The AI is busy right now. Try again in a minute.");
+// busy, out of quota, or not offered to this key: move on to the next model
+const busyErr = (msg: string) => /429|RESOURCE_EXHAUSTED|timeout|aborted|503|UNAVAILABLE|overloaded|quota|404|NOT_FOUND/i.test(msg);
+
+function keyOf(system: string, parts: (string | Part)[], schema: object) {
+  const h = createHash("sha256");
+  h.update(system);
+  h.update(JSON.stringify(schema));
+  for (const p of parts) h.update(typeof p === "string" ? p : (p.inlineData?.data ?? JSON.stringify(p)));
+  return h.digest("hex");
+}
+
+/**
+ * Ask Gemini for JSON matching `schema`.
+ * Identical questions are answered from a cache (the sample pact costs no quota after its first run).
+ * On rate limits the next model in the chain is tried; only when all are busy does it throw AIBusy.
+ */
+export async function askJSON<T>(system: string, parts: (string | Part)[], schema: object): Promise<T> {
+  const key = keyOf(system, parts, schema);
+  const hit = await cacheGet(key).catch(() => null);
+  if (hit) return hit as T;
+
+  for (const model of MODELS) {
+    try {
+      const res = await ai.models.generateContent({
+        model,
+        contents: [{ role: "user", parts: parts.map((p) => (typeof p === "string" ? { text: p } : p)) }],
+        config: {
+          systemInstruction: system,
+          responseMimeType: "application/json",
+          responseJsonSchema: schema,
+          temperature: 0.2,
+          httpOptions: { timeout: 30_000 },
+        },
+      });
+      const out = JSON.parse(res.text ?? "") as T;
+      await cachePut(key, out).catch(() => {});
+      return out;
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      console.error(`[ai] ${model}:`, msg.slice(0, 300));
+      if (!busyErr(msg)) throw e;
     }
-    throw e;
   }
+  throw new AIBusy("The AI is busy right now. Try again in a minute.");
 }

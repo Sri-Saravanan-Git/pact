@@ -3,27 +3,28 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AgGridReact } from "ag-grid-react";
 import { AllCommunityModule, ModuleRegistry, themeQuartz, type ColDef, type ICellRendererParams } from "ag-grid-community";
-import { STATUS, hhmm, pactCode } from "@/lib/ui";
+import { hhmm, pactCode } from "@/lib/ui";
+import { StatusPill } from "@/components/status-pill";
 import type { Pact, Status } from "@/lib/types";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const theme = themeQuartz.withParams({
-  backgroundColor: "#121314",
-  foregroundColor: "#f4f1e8",
-  headerBackgroundColor: "#121314",
-  headerTextColor: "#ffc72c",
-  headerFontWeight: 700,
-  oddRowBackgroundColor: "#17181a",
-  rowHoverColor: "#232427",
-  selectedRowBackgroundColor: "#2a2b2e",
-  borderColor: "rgba(244,241,232,0.12)",
-  accentColor: "#ffc72c",
-  fontFamily: "var(--font-flap)",
+  backgroundColor: "#ffffff",
+  foregroundColor: "#0b1a33",
+  headerBackgroundColor: "#f4f7fc",
+  headerTextColor: "#46546e",
+  headerFontWeight: 600,
+  oddRowBackgroundColor: "#ffffff",
+  rowHoverColor: "#f2f7ff",
+  selectedRowBackgroundColor: "#eaf2ff",
+  borderColor: "#e2e8f2",
+  accentColor: "#0b63f6",
+  fontFamily: "var(--font-sans)",
   fontSize: 14,
-  spacing: 7,
-  wrapperBorder: false,
-  wrapperBorderRadius: 0,
+  spacing: 8,
+  wrapperBorder: true,
+  wrapperBorderRadius: 20,
   columnBorder: false,
 });
 
@@ -41,12 +42,7 @@ type Row = {
 };
 
 function StatusCell(p: ICellRendererParams<Row, Status>) {
-  const s = STATUS[p.value!];
-  return (
-    <span className="font-bold tracking-[0.12em]" style={{ color: s.color }}>
-      {s.flap}
-    </span>
-  );
+  return <StatusPill status={p.value!} />;
 }
 
 export function BoardGrid() {
@@ -81,23 +77,23 @@ export function BoardGrid() {
 
   const cols = useMemo<ColDef<Row>[]>(
     () => [
-      { field: "time", headerName: "TIME", width: 150 },
-      { field: "code", headerName: "PACT", width: 110 },
-      { field: "task", headerName: "FOR", flex: 2, minWidth: 220 },
-      { field: "payee", headerName: "PAYEE", flex: 1, minWidth: 140 },
-      { field: "amount", headerName: "AMOUNT", width: 120, type: "rightAligned", valueFormatter: (p) => (p.value == null ? "—" : `$${p.value.toFixed(2)}`) },
-      { field: "status", headerName: "STATUS", width: 130, cellRenderer: StatusCell, filter: true },
-      { field: "promises", headerName: "PROMISES MET", width: 140 },
-      { field: "auth", headerName: "PAYPAL AUTH", width: 190 },
-      { field: "capture", headerName: "PAYPAL CAPTURE", width: 190 },
+      { field: "time", headerName: "Time", width: 150 },
+      { field: "code", headerName: "Pact", width: 110, cellClass: "t-num" },
+      { field: "task", headerName: "For", flex: 2, minWidth: 220 },
+      { field: "payee", headerName: "Payee", flex: 1, minWidth: 140 },
+      { field: "amount", headerName: "Amount", width: 120, type: "rightAligned", cellClass: "t-num", valueFormatter: (p) => (p.value == null ? "—" : `$${p.value.toFixed(2)}`) },
+      { field: "status", headerName: "Status", width: 150, cellRenderer: StatusCell, filter: true },
+      { field: "promises", headerName: "Promises met", width: 140 },
+      { field: "auth", headerName: "PayPal authorization", width: 200, cellClass: "t-num" },
+      { field: "capture", headerName: "PayPal capture", width: 200, cellClass: "t-num" },
     ],
     [],
   );
 
-  if (failed) return <p role="alert">The board could not load. Refresh to try again.</p>;
+  if (failed) return <p role="alert" className="t-small rounded-xl bg-stop-soft px-4 py-3 text-stop">The board could not load. Refresh to try again.</p>;
 
   return (
-    <div>
+    <div className="overflow-hidden rounded-[20px] shadow-[var(--shadow-card)]">
       <AgGridReact<Row>
         theme={theme}
         domLayout="autoHeight"

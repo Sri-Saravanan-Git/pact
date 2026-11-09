@@ -2,8 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { SplitFlap } from "@/components/split-flap";
-import { GATES, STATUS, gateOf, money, pactCode } from "@/lib/ui";
+import { motion } from "motion/react";
+import { StatusPill } from "@/components/status-pill";
+import { GATES, gateOf, money, pactCode } from "@/lib/ui";
 import type { Pact } from "@/lib/types";
 import { FlightLog } from "./flight-log";
 import { MandateStage, SecurityStage, PromisesStage, HoldStage, InspectionStage, ReleaseStage } from "./stages";
@@ -103,6 +104,7 @@ export function PactView() {
     const first = seenStatus === null;
     setSeenStatus(pact.status);
     const next: Role = pact.status === "held" || pact.status === "needs_fix" ? "freelancer" : "client";
+    if (pact.status === "paid" || pact.status === "voided") setRoleNote("");
     if (next !== role) {
       setRole(next);
       if (!first) setRoleNote(next === "freelancer" ? `Money is held. Now viewing as ${pact.offer?.seller ?? "the freelancer"} to deliver the work.` : "Delivery inspected. Back to Priya to decide.");
@@ -113,7 +115,8 @@ export function PactView() {
   const current = useRef<HTMLElement>(null);
   const stageKey = pact ? `${gate}-${pact.status}-${pact.criteria?.length ?? 0}` : "";
   useEffect(() => {
-    if (stageKey) current.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // wait a frame so the new stage has laid out before scrolling to it
+    if (stageKey) requestAnimationFrame(() => current.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }, [stageKey]);
 
   if (!pact) {
@@ -121,40 +124,42 @@ export function PactView() {
       <div className="wrap py-24">
         {error ? (
           <div role="alert">
-            <h1 className="text-[2.4rem] font-extrabold uppercase">Pact not found</h1>
+            <h1 className="t-h1 text-navy">Pact not found</h1>
             <p className="mt-2 text-ink-2">{error.msg}</p>
-            <Link href="/new" className="btn btn-ink mt-6">
+            <Link href="/new" className="btn btn-primary mt-6">
               Start a pact
             </Link>
           </div>
         ) : (
-          <p className="sign-label animate-pulse">Loading pact…</p>
+          <p className="t-small animate-pulse text-ink-3">Loading pact…</p>
         )}
       </div>
     );
   }
 
-  const s = STATUS[pact.status];
   const amount = pact.offer?.price ?? pact.mandate?.budget ?? 0;
   const stages = [MandateStage, SecurityStage, PromisesStage, HoldStage, InspectionStage, ReleaseStage];
   // a failed inspection still lets the client decide, so the release gate opens too
   const shown = pact.status === "needs_fix" ? 5 : Math.min(gate, 5);
   const props = { pact, role, act, submit, busy };
+  const roles: [Role, string][] = [
+    ["client", "Priya · client"],
+    ["freelancer", pact.offer?.seller ?? "Freelancer"],
+  ];
 
   return (
-    <div>
-      {/* the pact's own board row + gate rail stay pinned together */}
-      <div className="sticky top-16 z-30">
-      <div className="bg-board text-flap-ink">
-        <div className="wrap flex flex-wrap items-center gap-x-6 gap-y-2 py-3 text-[clamp(12px,1.35vw,18px)]">
-          <SplitFlap text={pactCode(pact.id)} length={8} className="text-sign" />
-          <SplitFlap text={(pact.mandate?.task ?? "").replace(/[^\w $&.,:/-]/g, "")} length={22} className="hidden md:inline" />
-          <SplitFlap text={money(amount)} length={8} />
-          <span style={{ color: s.color }}>
-            <SplitFlap text={s.flap} length={8} />
-          </span>
-          <div role="group" aria-label="View as" className="ml-auto flex border border-white/25 text-[0.8rem]">
-            {(["client", "freelancer"] as Role[]).map((r) => (
+    <div className="pb-24">
+      {/* pinned: what this pact is, where it stands, whose turn it is */}
+      <div className="glass sticky top-16 z-30 border-b border-line bg-white/85 backdrop-blur-xl backdrop-saturate-150">
+        <div className="wrap flex flex-wrap items-center gap-x-5 gap-y-3 py-3.5">
+          <div className="min-w-0 flex-1">
+            <p className="t-num t-micro text-ink-3">{pactCode(pact.id)}</p>
+            <h1 className="truncate text-[1.05rem] font-semibold tracking-[-0.015em] text-navy sm:text-[1.2rem]">{pact.mandate?.task ?? pact.request}</h1>
+          </div>
+          <p className="t-num text-[1.15rem] font-medium tracking-[-0.02em] text-navy">{money(amount)}</p>
+          <StatusPill status={pact.status} />
+          <div role="group" aria-label="View as" className="relative flex rounded-full bg-canvas p-1 ring-1 ring-line">
+            {roles.map(([r, label]) => (
               <button
                 key={r}
                 onClick={() => {
@@ -162,71 +167,89 @@ export function PactView() {
                   setRoleNote("");
                 }}
                 aria-pressed={role === r}
-                className={`sign-label px-3 py-2 transition-colors ${role === r ? "bg-sign text-sign-ink" : "text-flap-dim hover:text-flap-ink"}`}
+                className={`relative rounded-full px-3.5 py-1.5 text-[0.82rem] font-medium transition-colors duration-200 ${role === r ? "text-navy" : "text-ink-3 hover:text-ink"}`}
               >
-                {r === "client" ? "Priya · client" : `${pact.offer?.seller ?? "Freelancer"}`}
+                {role === r && <motion.span layoutId="role-thumb" transition={{ type: "spring", bounce: 0, duration: 0.35 }} className="absolute inset-0 rounded-full bg-white shadow-[var(--shadow-card)]" />}
+                <span className="relative">{label}</span>
               </button>
             ))}
           </div>
         </div>
+
+        <nav aria-label="Progress" className="wrap pb-3.5">
+          <ol className="relative grid grid-cols-6">
+            <div aria-hidden className="absolute top-[13px] right-[calc(100%/12)] left-[calc(100%/12)] h-[2px] bg-line">
+              <div className="h-full origin-left bg-blue transition-transform duration-700 ease-[var(--ease-out)]" style={{ transform: `scaleX(${Math.min(gate, 5) / 5})` }} />
+            </div>
+            {GATES.map((g, i) => {
+              const here = i === gate;
+              const done = i < gate;
+              return (
+                <li key={g.key} aria-current={here ? "step" : undefined} className="relative flex flex-col items-center gap-1.5 text-center">
+                  <span
+                    className={`relative z-10 grid h-7 w-7 place-items-center rounded-full text-[0.75rem] font-semibold transition-colors duration-300 ${
+                      done ? "bg-blue text-white" : here ? "pulse bg-white text-blue ring-2 ring-blue" : "bg-white text-ink-3 ring-1 ring-line-2"
+                    }`}
+                  >
+                    {done ? (
+                      <svg width="12" height="12" viewBox="0 0 12 12" aria-label="done">
+                        <path d="M2.5 6.3l2.3 2.3 4.7-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      i + 1
+                    )}
+                  </span>
+                  <span className={`text-[0.72rem] font-medium sm:text-[0.8rem] ${here ? "text-navy" : done ? "text-ink-2" : "text-ink-3"} ${here ? "" : "hidden sm:block"}`}>{g.name}</span>
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
       </div>
 
-      {/* gate rail with the NOW light */}
-      <nav aria-label="Gates" className="border-b border-ink bg-slab">
-        <ol className="wrap grid grid-cols-6">
-          {GATES.map((g, i) => {
-            const here = i === gate;
-            const done = i < gate;
-            return (
-              <li key={g.key} aria-current={here ? "step" : undefined} className={`relative border-l border-hair py-2 pl-2 first:border-l-0 sm:py-3 sm:pl-3 ${here ? "bg-sign" : ""}`}>
-                <span className={`num text-[0.75rem] ${done ? "text-ink" : here ? "text-sign-ink" : "text-ink-2"}`}>{done ? <svg width="12" height="12" viewBox="0 0 12 12" aria-label="passed" className="inline"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="currentColor" strokeWidth="2"/></svg> : `G${i + 1}`}</span>
-                <span className={`font-sign text-[0.82rem] font-bold uppercase sm:block sm:text-[1rem] ${here ? "absolute top-full left-0 z-10 bg-sign px-2 pb-1 sm:static sm:bg-transparent sm:p-0" : "hidden"} ${!done && !here ? "text-ink-2" : ""}`}>{g.name}</span>
-                {here && <span aria-hidden className="now-light absolute top-3 right-2 h-2.5 w-2.5 rounded-full bg-paid ring-2 ring-ink" />}
-              </li>
-            );
-          })}
-        </ol>
-      </nav>
-      </div>
-
-      <div className="wrap grid gap-10 py-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0 space-y-8">
+      <div className="wrap grid gap-8 pt-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 space-y-7">
           {roleNote && (
-            <div role="status" className="flex items-start justify-between gap-4 border-[3px] border-ink bg-sign px-5 py-3 font-medium text-sign-ink">
-              <span>{roleNote}</span>
-              <button className="sign-label underline" onClick={() => setRoleNote("")}>
+            <div role="status" className="swap flex items-start justify-between gap-4 rounded-2xl bg-blue px-5 py-3.5 text-white shadow-[var(--shadow-blue)]">
+              <span className="t-small font-medium">{roleNote}</span>
+              <button className="t-small font-semibold text-white/80 hover:text-white" onClick={() => setRoleNote("")}>
                 Dismiss
               </button>
             </div>
           )}
-          {stages.slice(0, shown + 1).map((Stage, i) => (
-            <section key={i} ref={i === shown ? current : undefined} className="scroll-mt-[13rem]" aria-labelledby={`g${i}`}>
-              <header className="mb-3 flex items-baseline gap-3">
-                <span className={`num px-1.5 text-[0.8rem] ${i < shown || pact.status === "paid" ? "bg-ink text-sign" : "bg-sign text-sign-ink"}`}>G{i + 1}</span>
-                <h2 id={`g${i}`} className="text-[1.7rem] font-extrabold uppercase">
-                  {GATES[i].name}
-                </h2>
-                <span className="sign-label ml-auto hidden text-ink-2 sm:inline">{GATES[i].by}</span>
-              </header>
-              <Stage {...props} />
-            </section>
-          ))}
+          {stages.slice(0, shown + 1).map((Stage, i) => {
+            const done = i < shown || pact.status === "paid" || pact.status === "voided";
+            return (
+              <section key={i} ref={i === shown ? current : undefined} className="rise scroll-mt-[11.5rem]" aria-labelledby={`g${i}`}>
+                <header className="mb-3 flex items-center gap-3">
+                  <span className={`grid h-6 w-6 place-items-center rounded-full text-[0.72rem] font-semibold ${done ? "bg-mist text-blue" : "bg-blue text-white"}`}>{i + 1}</span>
+                  <h2 id={`g${i}`} className="t-h3 text-navy">
+                    {GATES[i].name}
+                  </h2>
+                  <span className="chip ml-auto hidden bg-white text-ink-3 ring-1 ring-line sm:inline-flex">{GATES[i].by}</span>
+                </header>
+                <Stage {...props} />
+              </section>
+            );
+          })}
 
           {busy && (
-            <div role="status" aria-live="polite" className="relative overflow-hidden bg-board px-5 py-4 text-flap-ink">
-              <span className="relative z-10 flex items-center gap-3">
-                <span className="now-light h-2.5 w-2.5 rounded-full bg-sign" aria-hidden />
-                {busy}…
-              </span>
-              <span aria-hidden className="absolute inset-y-0 w-1 bg-sign" style={{ animation: "belt 1.6s linear infinite" }} />
+            <div role="status" aria-live="polite" className="card swap overflow-hidden">
+              <div className="flex items-center gap-3 px-5 py-4">
+                <span aria-hidden className="pulse h-2.5 w-2.5 rounded-full bg-blue" />
+                <span className="t-small font-medium text-navy">{busy}…</span>
+              </div>
+              <div aria-hidden className="h-[2px] overflow-hidden bg-mist">
+                <div className="h-full w-1/4 bg-blue" style={{ animation: "belt 1.4s var(--ease-in-out) infinite" }} />
+              </div>
             </div>
           )}
           {error && !busy && (
-            <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border-[3px] border-stop bg-white px-5 py-4">
-              <span className="font-medium">{error.msg}</span>
+            <div role="alert" className="swap flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stop/20 bg-stop-soft px-5 py-4">
+              <span className="t-small font-medium text-stop">{error.msg}</span>
               {error.retry && (
                 <button
-                  className="btn btn-ink btn-sm"
+                  className="btn btn-primary btn-sm"
                   onClick={() => {
                     const r = error.retry!;
                     if ("form" in r) submit(r.form);
