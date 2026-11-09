@@ -17,7 +17,7 @@ const TONES: Record<Tone, string> = {
   stop: "bg-stop-soft text-stop",
   hold: "bg-held-soft text-held",
   blue: "bg-check-soft text-blue",
-  ink: "bg-navy text-white",
+  ink: "bg-deep text-white",
   muted: "bg-canvas text-ink-3",
 };
 const Tag = ({ tone, children }: { tone: Tone; children: React.ReactNode }) => <span className={`chip ${TONES[tone]}`}>{children}</span>;
@@ -132,7 +132,7 @@ export function SecurityStage({ pact, busy }: P) {
         })}
       </ul>
       {pact.offer && (
-        <div className="rounded-[20px] bg-navy px-6 py-5 text-white">
+        <div className="rounded-[20px] bg-deep px-6 py-5 text-white ring-1 ring-white/10">
           <p className="t-micro text-sky">Agent’s choice · {pact.offer.seller}</p>
           <p className="t-body mt-1.5 max-w-[62ch]">{pact.agentReason}</p>
           <p className="t-small mt-3 text-white/60">The agent only saw listings that cleared security, and can only pay an offer it chose from them.</p>

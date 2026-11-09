@@ -150,7 +150,7 @@ export function PactView() {
   return (
     <div className="pb-24">
       {/* pinned: what this pact is, where it stands, whose turn it is */}
-      <div className="glass sticky top-16 z-30 border-b border-line bg-white/85 backdrop-blur-xl backdrop-saturate-150">
+      <div className="glass sticky top-16 z-30 border-b border-line bg-surface/85 backdrop-blur-xl backdrop-saturate-150">
         <div className="wrap flex flex-wrap items-center gap-x-5 gap-y-3 py-3.5">
           <div className="min-w-0 flex-1">
             <p className="t-num t-micro text-ink-3">{pactCode(pact.id)}</p>
@@ -169,7 +169,7 @@ export function PactView() {
                 aria-pressed={role === r}
                 className={`relative rounded-full px-3.5 py-1.5 text-[0.82rem] font-medium transition-colors duration-200 ${role === r ? "text-navy" : "text-ink-3 hover:text-ink"}`}
               >
-                {role === r && <motion.span layoutId="role-thumb" transition={{ type: "spring", bounce: 0, duration: 0.35 }} className="absolute inset-0 rounded-full bg-white shadow-[var(--shadow-card)]" />}
+                {role === r && <motion.span layoutId="role-thumb" transition={{ type: "spring", bounce: 0, duration: 0.35 }} className="absolute inset-0 rounded-full bg-surface shadow-[var(--shadow-card)]" />}
                 <span className="relative">{label}</span>
               </button>
             ))}
@@ -188,7 +188,7 @@ export function PactView() {
                 <li key={g.key} aria-current={here ? "step" : undefined} className="relative flex flex-col items-center gap-1.5 text-center">
                   <span
                     className={`relative z-10 grid h-7 w-7 place-items-center rounded-full text-[0.75rem] font-semibold transition-colors duration-300 ${
-                      done ? "bg-blue text-white" : here ? "pulse bg-white text-blue ring-2 ring-blue" : "bg-white text-ink-3 ring-1 ring-line-2"
+                      done ? "bg-blue text-white" : here ? "pulse bg-surface text-blue ring-2 ring-blue" : "bg-surface text-ink-3 ring-1 ring-line-2"
                     }`}
                   >
                     {done ? (
@@ -226,7 +226,7 @@ export function PactView() {
                   <h2 id={`g${i}`} className="t-h3 text-navy">
                     {GATES[i].name}
                   </h2>
-                  <span className="chip ml-auto hidden bg-white text-ink-3 ring-1 ring-line sm:inline-flex">{GATES[i].by}</span>
+                  <span className="chip ml-auto hidden bg-surface text-ink-3 ring-1 ring-line sm:inline-flex">{GATES[i].by}</span>
                 </header>
                 <Stage {...props} />
               </section>

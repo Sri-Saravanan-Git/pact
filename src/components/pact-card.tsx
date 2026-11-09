@@ -46,7 +46,7 @@ export function PactCard() {
   const ph = PHASES[still ? 3 : phase];
 
   return (
-    <div className="mx-auto w-full max-w-[480px]">
+    <div className="force-light mx-auto w-full max-w-[480px]">
     <div
       ref={box}
       className="relative aspect-[1.32] w-full [perspective:1400px]"
@@ -135,7 +135,7 @@ export function PactCard() {
         </div>
 
         {/* BACK */}
-        <div className="absolute inset-0 overflow-hidden rounded-[28px] bg-navy p-6 text-white shadow-[var(--shadow-lift)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-7">
+        <div className="absolute inset-0 overflow-hidden rounded-[28px] bg-deep p-6 text-white shadow-[var(--shadow-lift)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-7">
           <p className="t-micro text-sky">Activity · every step has a receipt</p>
           <ol className="mt-4 space-y-2.5">
             {[

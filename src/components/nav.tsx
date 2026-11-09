@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CoinToggle } from "./coin-toggle";
 
 export function Mark({ size = 30 }: { size?: number }) {
   return <Image src="/logo.png" alt="" width={size} height={size} priority className="shrink-0 rounded-[26%] shadow-[0_4px_14px_-4px_rgb(59_91_255/0.6)]" />;
@@ -43,7 +44,7 @@ export function NavBar({ dark = false, path = "" }: { dark?: boolean; path?: str
   return (
     <header
       className={`glass sticky top-0 z-40 border-b backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color] duration-300 ${
-        dark ? "border-white/10 bg-[#050f33]/35" : "border-line/70 bg-white/72"
+        dark ? "border-white/10 bg-[#050f33]/35" : "border-line/70 bg-surface/72"
       }`}
     >
       <nav aria-label="Main" className="wrap flex h-16 items-center justify-between gap-4">
@@ -66,6 +67,7 @@ export function NavBar({ dark = false, path = "" }: { dark?: boolean; path?: str
               </Link>
             );
           })}
+          <CoinToggle onDark={dark} />
           <Link href="/new" className={`btn btn-sm ml-1 ${dark ? "btn-white" : "btn-primary"}`}>
             Start a pact
           </Link>

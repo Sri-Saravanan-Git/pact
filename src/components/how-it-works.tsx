@@ -31,7 +31,7 @@ export function HowItWorks() {
           transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
           className="relative grid grid-cols-[48px_1fr] gap-5 pb-10 last:pb-0"
         >
-          <span className="relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-line bg-white text-blue shadow-[var(--shadow-card)]">
+          <span className="relative z-10 grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface text-blue shadow-[var(--shadow-card)]">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               {ICONS[g.key]}
             </svg>

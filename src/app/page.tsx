@@ -106,7 +106,7 @@ export default function Home() {
       </section>
 
       {/* PAYPAL: the money path, as API calls */}
-      <section aria-labelledby="pp-h" className="on-blue relative overflow-hidden bg-navy py-24 text-white">
+      <section aria-labelledby="pp-h" className="on-blue relative overflow-hidden bg-deep py-24 text-white">
         <div aria-hidden className="pointer-events-none absolute -top-40 right-[-10%] h-[36rem] w-[36rem] rounded-full bg-blue/40 blur-[120px]" />
         <div aria-hidden className="pointer-events-none absolute bottom-[-12rem] left-[-8%] h-[28rem] w-[28rem] rounded-full bg-sky/25 blur-[120px]" />
         <div className="wrap relative grid gap-12 lg:grid-cols-[1fr_1.25fr] lg:items-center">

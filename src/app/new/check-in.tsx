@@ -76,7 +76,7 @@ export function CheckIn() {
                     disabled={busy}
                     onClick={() => setText(p.text)}
                     aria-pressed={text === p.text}
-                    className={`chip h-8 cursor-pointer px-3 transition-colors duration-200 ${text === p.text ? "bg-navy text-white" : "bg-canvas text-ink-2 hover:bg-mist hover:text-navy"}`}
+                    className={`chip h-8 cursor-pointer px-3 transition-colors duration-200 ${text === p.text ? "bg-blue text-white" : "bg-canvas text-ink-2 hover:bg-mist hover:text-navy"}`}
                   >
                     {p.label}
                   </button>
