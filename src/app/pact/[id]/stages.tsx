@@ -6,6 +6,7 @@ import { money } from "@/lib/ui";
 import type { Pact } from "@/lib/types";
 import type { Act, Role } from "./pact-view";
 import { PayPalButtons } from "./paypal-buttons";
+import CountUp from "@/components/CountUp";
 
 type P = { pact: Pact; role: Role; act: Act; submit: (f: FormData) => Promise<void>; busy: string | null };
 type Tone = "ok" | "stop" | "hold" | "blue" | "ink" | "muted";
@@ -390,7 +391,7 @@ export function ReleaseStage({ pact, role, act, busy }: P) {
           Captured by PayPal
         </p>
         <p className="t-h1 relative mt-3">
-          {price} paid to {pact.offer?.seller}
+          <CountUp to={pact.offer?.price ?? 0} prefix="$" decimals={2} duration={1.1} trigger="load" className="t-num" /> paid to {pact.offer?.seller}
         </p>
         <p className="t-num t-small mt-2 break-all text-white/70">Capture ID {pact.paypal.captureId}</p>
         <div className="relative mt-7 flex flex-wrap gap-3">

@@ -41,7 +41,7 @@ export function CheckIn() {
   }, [sample]);
 
   return (
-    <div className="min-h-[calc(100dvh-4rem)] bg-[radial-gradient(70%_50%_at_50%_0%,#e6f0ff_0%,transparent_70%)]">
+    <div className="min-h-[calc(100dvh-4rem)]">
       <div className="wrap grid gap-10 py-14 lg:grid-cols-[1.35fr_1fr] lg:py-20">
         <form
           className="rise"
@@ -51,7 +51,7 @@ export function CheckIn() {
           }}
         >
           <h1 className="t-h1 text-navy">What should your agent get done?</h1>
-          <p className="t-lead mt-4 max-w-[50ch] text-ink-2">Say it the way you would to a person. Include a budget and a deadline. Pact turns it into limits the agent cannot cross.</p>
+          <p className="t-lead mt-4 max-w-[50ch] text-ink-2">Describe it the way you’d tell a person, with a budget and a deadline. Pact turns your words into limits the agent can’t cross.</p>
 
           <div className="card mt-8 overflow-hidden focus-within:ring-2 focus-within:ring-blue/30">
             <label htmlFor="req" className="sr-only">
@@ -100,7 +100,7 @@ export function CheckIn() {
               {error}
             </p>
           )}
-          <p className="t-small mt-4 text-ink-3">{busy ? "The AI is reading your request. About 5 seconds." : "The demo marketplace stocks logo design. PayPal sandbox only."}</p>
+          <p className="t-small mt-4 text-ink-3">{busy ? "The AI is reading your request. About 5 seconds." : "The demo marketplace sells logo design. Everything runs in the PayPal sandbox."}</p>
         </form>
 
         <aside className="rise self-start [animation-delay:100ms]">

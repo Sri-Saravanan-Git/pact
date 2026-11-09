@@ -65,7 +65,7 @@ export function PactCard() {
       <motion.div
         aria-hidden
         style={{ x: fx, y: fy, rotate: -4 }}
-        className="pointer-events-none absolute -bottom-8 -left-3 z-20 w-[58%] rounded-2xl border border-stop/15 bg-white p-3.5 shadow-[var(--shadow-lift)] sm:-left-10"
+        className="pointer-events-none absolute -bottom-16 -left-3 z-20 w-[56%] rounded-2xl border border-white/80 bg-white/75 p-3.5 shadow-[var(--shadow-lift)] backdrop-blur-xl backdrop-saturate-150 sm:-left-10"
       >
         <p className="t-micro flex items-center gap-1.5 text-stop">
           <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
@@ -86,7 +86,7 @@ export function PactCard() {
         className="relative h-full w-full cursor-pointer rounded-[28px] text-left [transform-style:preserve-3d]"
       >
         {/* FRONT */}
-        <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-white bg-[linear-gradient(150deg,#ffffff_0%,#f3f8ff_55%,#e3eeff_100%)] p-6 shadow-[var(--shadow-lift)] [backface-visibility:hidden] sm:p-7">
+        <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(150deg,rgb(255_255_255/0.82),rgb(234_242_255/0.55))] p-6 backdrop-blur-2xl backdrop-saturate-150 shadow-[var(--shadow-lift)] [backface-visibility:hidden] sm:p-7">
           <motion.div aria-hidden className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: glare }} />
           <div className="relative flex h-full flex-col">
             <div className="flex items-center justify-between">
@@ -154,7 +154,7 @@ export function PactCard() {
         </div>
       </motion.button>
     </div>
-    <p className="t-micro mt-5 text-center text-ink-3">Sample pact · tap the card to see its receipts</p>
+    <p className="t-micro mt-20 text-center text-ink-3 sm:mt-6 sm:pl-[50%]">Sample pact · tap the card to flip it</p>
     </div>
   );
 }

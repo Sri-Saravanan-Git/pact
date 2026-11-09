@@ -25,12 +25,12 @@ export function SecurityBelt() {
   useMotionValueEvent(scrollYProgress, "change", (v) => setStep(Math.min(3, Math.floor(v * 4.2))));
 
   return (
-    <section ref={ref} aria-labelledby="security-h" className="relative bg-white" style={{ height: still ? "auto" : "300vh" }}>
+    <section ref={ref} aria-labelledby="security-h" className="relative" style={{ height: still ? "auto" : "300vh" }}>
       <div className={`${still ? "" : "sticky top-16 h-[calc(100dvh-4rem)]"} overflow-hidden`}>
         <div className="wrap grid h-full items-center gap-8 py-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
           <div className="relative z-10">
             <h2 id="security-h" className="t-h1 mb-8 text-navy">
-              No listing gets to whisper to your agent.
+              Your agent never reads a poisoned listing.
             </h2>
             <ol className="relative space-y-1">
               {STEPS.map((s, i) => {
@@ -72,7 +72,7 @@ function StaticBelt() {
   return (
     <ul className="grid h-full content-center gap-2 px-8">
       {parcels.map((p) => (
-        <li key={p.seller} className={`t-num flex justify-between rounded-xl px-4 py-3 ${p.bad ? "bg-stop-soft text-stop" : "bg-canvas text-navy"}`}>
+        <li key={p.seller} className={`card t-num flex justify-between px-4 py-3 ${p.bad ? "text-stop" : "text-navy"}`}>
           <span>{p.seller}</span>
           <span>{p.bad ? "Quarantined" : p.price}</span>
         </li>

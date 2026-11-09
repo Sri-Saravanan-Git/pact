@@ -10,20 +10,20 @@ import type { Pact, Status } from "@/lib/types";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const theme = themeQuartz.withParams({
-  backgroundColor: "#ffffff",
+  backgroundColor: "rgba(255,255,255,0.0)",
   foregroundColor: "#0b1a33",
-  headerBackgroundColor: "#f4f7fc",
+  headerBackgroundColor: "rgba(244,247,252,0.6)",
   headerTextColor: "#46546e",
   headerFontWeight: 600,
-  oddRowBackgroundColor: "#ffffff",
-  rowHoverColor: "#f2f7ff",
+  oddRowBackgroundColor: "rgba(255,255,255,0.0)",
+  rowHoverColor: "rgba(11,99,246,0.06)",
   selectedRowBackgroundColor: "#eaf2ff",
   borderColor: "#e2e8f2",
   accentColor: "#0b63f6",
   fontFamily: "var(--font-sans)",
   fontSize: 14,
   spacing: 8,
-  wrapperBorder: true,
+  wrapperBorder: false,
   wrapperBorderRadius: 20,
   columnBorder: false,
 });
@@ -93,7 +93,7 @@ export function BoardGrid() {
   if (failed) return <p role="alert" className="t-small rounded-xl bg-stop-soft px-4 py-3 text-stop">The board could not load. Refresh to try again.</p>;
 
   return (
-    <div className="overflow-hidden rounded-[20px] shadow-[var(--shadow-card)]">
+    <div className="card overflow-hidden">
       <AgGridReact<Row>
         theme={theme}
         domLayout="autoHeight"

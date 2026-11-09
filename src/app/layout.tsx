@@ -18,6 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body>
+        <div aria-hidden className="ambient" />
         <a href="#main" className="skip">
           Skip to content
         </a>
