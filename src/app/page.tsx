@@ -5,6 +5,9 @@ import { LiveActivity } from "@/components/live-activity";
 import { SecurityBelt } from "@/components/security-belt";
 import { HowItWorks } from "@/components/how-it-works";
 import { Wordmark } from "@/components/nav";
+import { LivingBackground } from "@/components/living-background";
+import { GlassLink } from "@/components/glass-link";
+import AnimatedContent from "@/components/AnimatedContent";
 
 const CALLS = [
   { path: "/v2/checkout/orders", note: "intent AUTHORIZE, freelancer set as payee", out: "On hold", tone: "bg-held-soft text-held" },
@@ -23,41 +26,35 @@ const HEADLINE = "Money that moves only when the promise is";
 export default function Home() {
   return (
     <>
-      {/* HERO */}
-      <section aria-labelledby="hero-h" className="relative overflow-x-clip">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-32 left-[8%] h-[30rem] w-[30rem] rounded-full bg-sky/30 blur-[110px]" />
-          <div className="absolute top-10 right-[4%] h-[34rem] w-[34rem] rounded-full bg-blue/25 blur-[120px]" />
-          <div className="absolute bottom-0 left-[38%] h-[18rem] w-[26rem] rounded-full bg-mist-2/70 blur-[90px]" />
-        </div>
-        <div className="wrap relative grid items-center gap-14 pt-14 pb-20 lg:grid-cols-[1.2fr_1fr] lg:pt-20 lg:pb-28">
+      {/* HERO: brand-world dark, with living light ribbons */}
+      <section aria-labelledby="hero-h" className="on-blue relative -mt-16 overflow-x-clip pt-16 text-white">
+        <LivingBackground />
+        <div className="wrap relative grid items-center gap-14 pt-16 pb-24 lg:grid-cols-[1.2fr_1fr] lg:pt-24 lg:pb-36">
           <div>
             <h1 id="hero-h" className="sr-only">
               {HEADLINE} proven.
             </h1>
-            <div aria-hidden className="t-display text-navy">
+            <div aria-hidden className="t-display text-white">
               <BlurText text={HEADLINE} className="inline" animateBy="words" delay={70} trigger="load" />{" "}
-              <BlurText text="proven." className="inline text-blue" animateBy="words" delay={70} trigger="load" stepDuration={0.5} />
+              <BlurText text="proven." className="inline text-[#8ccaff]" animateBy="words" delay={70} trigger="load" stepDuration={0.5} />
             </div>
-            <p className="t-lead rise mt-6 max-w-[46ch] text-ink-2 [animation-delay:350ms]">
+            <p className="t-lead rise mt-6 max-w-[46ch] text-white/75 [animation-delay:350ms]">
               Describe the job in plain words. An AI agent hires within limits it can’t break, PayPal holds the payment, and it’s released only when every promise checks out.
             </p>
-            <div className="rise mt-9 flex flex-wrap gap-3 [animation-delay:450ms]">
+            <div className="rise mt-9 flex flex-wrap items-center gap-3 [animation-delay:450ms]">
               <Link href="/new?sample=1" className="btn btn-primary">
                 Watch a pact run
                 <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
                   <path d="M3 8h9M8.5 4.5L12 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
-              <Link href="/new" className="btn btn-ghost">
-                Start your own
-              </Link>
+              <GlassLink href="/new">Start your own</GlassLink>
             </div>
-            <p className="t-small rise mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-3 [animation-delay:550ms]">
+            <p className="t-small rise mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-white/55 [animation-delay:550ms]">
               <span>PayPal Orders v2</span>
-              <span aria-hidden className="h-1 w-1 rounded-full bg-line-2" />
+              <span aria-hidden className="h-1 w-1 rounded-full bg-white/30" />
               <span>Gemini AI</span>
-              <span aria-hidden className="h-1 w-1 rounded-full bg-line-2" />
+              <span aria-hidden className="h-1 w-1 rounded-full bg-white/30" />
               <span>Sandbox demo · 3 minutes</span>
             </p>
           </div>
@@ -69,7 +66,7 @@ export default function Home() {
 
       {/* WHY + live proof */}
       <section aria-labelledby="why-h" className="py-20">
-        <div className="wrap grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+        <AnimatedContent distance={40} blur={6} stagger={0.15} duration={0.8} className="wrap grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:items-start">
           <div>
             <h2 id="why-h" className="t-h2 text-navy">
               Paying a stranger takes trust. Letting an AI pay one takes more.
@@ -88,7 +85,7 @@ export default function Home() {
             </dl>
           </div>
           <LiveActivity />
-        </div>
+        </AnimatedContent>
       </section>
 
       <SecurityBelt />
@@ -121,6 +118,7 @@ export default function Home() {
               PayPal holds the authorization with the freelancer already set as payee. Pact only decides <strong className="font-semibold text-white">when</strong> to capture or void, and records every call.
             </p>
           </div>
+          <AnimatedContent distance={30} blur={6} duration={0.8}>
           <ul className="card-dark overflow-hidden rounded-[20px]">
             {CALLS.map((c, i) => (
               <li key={c.path} className={`grid gap-2 px-6 py-5 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 ${i ? "border-t border-white/10" : ""}`}>
@@ -135,6 +133,7 @@ export default function Home() {
               </li>
             ))}
           </ul>
+          </AnimatedContent>
         </div>
       </section>
 
@@ -143,39 +142,34 @@ export default function Home() {
           <h2 id="ladder-h" className="t-h1 max-w-[18ch] text-navy">
             Code checks. AI advises. You decide.
           </h2>
-          <ol className="mt-12 grid gap-4 md:grid-cols-3">
+          <AnimatedContent distance={36} blur={6} stagger={0.12} duration={0.8} className="mt-12 grid gap-4 md:grid-cols-3">
             {LADDER.map((l, i) => (
-              <li key={l.who} className="card relative p-7">
+              <div key={l.who} className="card relative p-7">
                 <div className="flex items-baseline justify-between">
                   <h3 className="text-[2.25rem] leading-none font-semibold tracking-[-0.03em] text-navy">{l.who}</h3>
                   <span className="t-num text-[0.8rem] text-ink-3">{String(i + 1).padStart(2, "0")}</span>
                 </div>
                 <p className="t-small mt-2 font-semibold text-blue">{l.tag}</p>
                 <p className="t-body mt-3 text-ink-2">{l.does}</p>
-              </li>
+              </div>
             ))}
-          </ol>
+          </AnimatedContent>
         </div>
       </section>
 
-      <section aria-labelledby="go-h" className="on-blue relative overflow-hidden bg-blue py-20 text-white">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 right-[10%] h-[24rem] w-[24rem] rounded-full bg-sky/60 blur-[100px]" />
-          <div className="absolute -bottom-32 left-[5%] h-[22rem] w-[30rem] rounded-full bg-navy/50 blur-[100px]" />
-        </div>
-        <div className="wrap relative flex flex-col justify-between gap-8 md:flex-row md:items-end">
+      <section aria-labelledby="go-h" className="on-blue relative overflow-hidden py-28 text-white">
+        <LivingBackground />
+        <AnimatedContent distance={40} blur={8} duration={0.9} className="wrap relative flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <h2 id="go-h" className="t-h1 max-w-[16ch]">
             Watch a promise get proven in three minutes.
           </h2>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link href="/new?sample=1" className="btn btn-white">
               Watch a pact run
             </Link>
-            <Link href="/board" className="btn btn-on-blue backdrop-blur-md">
-              Open the board
-            </Link>
+            <GlassLink href="/board">Open the board</GlassLink>
           </div>
-        </div>
+        </AnimatedContent>
       </section>
 
       <footer className="py-10">

@@ -7,6 +7,7 @@ import type { Pact } from "@/lib/types";
 import type { Act, Role } from "./pact-view";
 import { PayPalButtons } from "./paypal-buttons";
 import CountUp from "@/components/CountUp";
+import HoldButton from "@/components/HoldButton";
 
 type P = { pact: Pact; role: Role; act: Act; submit: (f: FormData) => Promise<void>; busy: string | null };
 type Tone = "ok" | "stop" | "hold" | "blue" | "ink" | "muted";
@@ -426,10 +427,23 @@ export function ReleaseStage({ pact, role, act, busy }: P) {
           ? `Every promise checked out. Release ${price} to ${pact.offer?.seller}? PayPal captures the held money straight to them.`
           : "Some promises were not met. The freelancer can deliver a fix, or you can decide yourself. The AI only advises."}
       </p>
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button className="btn btn-primary" disabled={!!busy} onClick={() => act("release")}>
-          {ok ? `Release ${price}` : `Release ${price} anyway`}
-        </button>
+      <p className="t-micro mt-2 text-ink-3">Moving money can’t be undone, so release asks you to press and hold for a second.</p>
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <HoldButton
+          size="lg"
+          radius={999}
+          holdTime={1100}
+          backgroundColor="#0b63f6"
+          fillColor="#071d49"
+          textColor="#ffffff"
+          fillTextColor="#ffffff"
+          glow
+          disabled={!!busy}
+          doneLabel="Releasing…"
+          onHold={() => act("release")}
+        >
+          {ok ? `Hold to release ${price}` : `Hold to release ${price} anyway`}
+        </HoldButton>
         <button className="btn btn-ghost" disabled={!!busy} onClick={() => act("void")}>
           Void the hold
         </button>

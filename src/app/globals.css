@@ -22,6 +22,7 @@
   --color-blue: #0b63f6;
   --color-blue-press: #0a52cc;
   --color-sky: #3aa0ff;
+  --color-violet: #7c3aed;
 
   --color-paid: #0f9f62;
   --color-paid-soft: #e3f7ee;
@@ -240,6 +241,37 @@
     color: #fff;
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.35);
   }
+  .btn-glass {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: #fff;
+    background: rgb(255 255 255 / 0.1);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.35),
+      inset 0 0 0 1px rgb(255 255 255 / 0.22),
+      0 8px 24px -10px rgb(8 20 70 / 0.6);
+  }
+  .btn-glass::before {
+    content: "";
+    position: absolute;
+    inset: -40% auto -40% -60%;
+    width: 50%;
+    z-index: -1;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: translateX(0) skewX(-18deg);
+    transition: transform 700ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-glass:hover::before {
+      transform: translateX(420%) skewX(-18deg);
+    }
+    .btn-glass:hover {
+      background: rgb(255 255 255 / 0.16);
+    }
+  }
   .btn-sm {
     min-height: 2.25rem;
     padding: 0 0.9rem;
@@ -314,6 +346,89 @@
   to {
     transform: translateX(400%);
   }
+}
+
+/* Living background: long, gentle cycles so it breathes rather than flickers. */
+@keyframes lb-breathe-glow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate3d(3%, 4%, 0) scale(1.14);
+    opacity: 1;
+  }
+}
+@keyframes lb-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes lb-swell {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-14px) scaleY(1.08);
+    opacity: 1;
+  }
+}
+.lb-glow {
+  animation: lb-breathe-glow 16s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.lb-d2 {
+  animation-duration: 19s;
+  animation-delay: -6s;
+}
+.lb-d3 {
+  animation-duration: 22s;
+  animation-delay: -11s;
+}
+.lb-drift {
+  animation: lb-drift 48s linear infinite;
+  will-change: transform;
+}
+.lb-rev {
+  animation-duration: 64s;
+  animation-direction: reverse;
+}
+.lb-breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lb-swell 14s ease-in-out infinite;
+}
+
+/* the light pages breathe too, more quietly */
+.ambient::before,
+.ambient::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(110px);
+  animation: lb-breathe-glow 20s ease-in-out infinite;
+}
+.ambient::before {
+  width: 34rem;
+  height: 34rem;
+  left: -8rem;
+  top: 20%;
+  background: rgb(58 160 255 / 0.22);
+}
+.ambient::after {
+  width: 30rem;
+  height: 30rem;
+  right: -6rem;
+  bottom: 5%;
+  background: rgb(124 58 237 / 0.12);
+  animation-duration: 24s;
+  animation-delay: -9s;
 }
 
 @media (prefers-reduced-motion: reduce) {

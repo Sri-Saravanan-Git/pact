@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Nav } from "@/components/nav";
+import { Suspense } from "react";
+import { Nav, NavBar } from "@/components/nav";
 import "./globals.css";
 
 const sans = Geist({ variable: "--nf-sans", subsets: ["latin"] });
@@ -22,7 +23,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip">
           Skip to content
         </a>
-        <Nav />
+        <Suspense fallback={<NavBar />}>
+          <Nav />
+        </Suspense>
         <main id="main">{children}</main>
       </body>
     </html>

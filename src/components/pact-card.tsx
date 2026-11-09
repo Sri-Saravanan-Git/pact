@@ -86,7 +86,7 @@ export function PactCard() {
         className="relative h-full w-full cursor-pointer rounded-[28px] text-left [transform-style:preserve-3d]"
       >
         {/* FRONT */}
-        <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(150deg,rgb(255_255_255/0.82),rgb(234_242_255/0.55))] p-6 backdrop-blur-2xl backdrop-saturate-150 shadow-[var(--shadow-lift)] [backface-visibility:hidden] sm:p-7">
+        <div className="absolute inset-0 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(150deg,rgb(255_255_255/0.94),rgb(234_242_255/0.82))] p-6 backdrop-blur-2xl backdrop-saturate-150 shadow-[var(--shadow-lift)] [backface-visibility:hidden] sm:p-7">
           <motion.div aria-hidden className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: glare }} />
           <div className="relative flex h-full flex-col">
             <div className="flex items-center justify-between">
