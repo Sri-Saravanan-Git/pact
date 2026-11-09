@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const { request } = await req.json();
     const text = String(request ?? "").trim().slice(0, 600);
     if (text.length < 10) return Response.json({ error: "Describe what you need in a sentence or two." }, { status: 400 });
-    // ponytail: global daily cap protects the free AI quota; per-IP limits if abuse shows up
+    // Known limit: global daily cap protects the free AI quota; per-IP limits if abuse shows up
     if ((await pactsCreatedToday()) > 300) return Response.json({ error: "Demo limit reached for today. Try the sample pact instead." }, { status: 429 });
 
     const p: Pact = { id: crypto.randomUUID().slice(0, 8), createdAt: new Date().toISOString(), request: text, status: "drafting", paypal: {}, submissions: [], events: [] };

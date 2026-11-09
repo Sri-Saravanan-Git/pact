@@ -3,11 +3,15 @@ import { log, verify, UserError } from "@/lib/flow";
 import { fail } from "@/lib/http";
 import { SAMPLES } from "@/lib/samples";
 import type { InFile } from "@/lib/checks";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 export const maxDuration = 60;
 
 const MAX_FILES = 6;
 const MAX_BYTES = 1_500_000;
+const MAX_TOTAL = 4_000_000; // stays under the hosting request-body limit
+const MAX_SUBMISSIONS = 6; // each one spends AI quota
 
 export async function POST(req: Request, ctx: RouteContext<"/api/pacts/[id]/submit">) {
   try {
@@ -15,6 +19,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/pacts/[id]/subm
     const p = await getPact(id);
     if (!p) throw new UserError("Pact not found.");
     if (!["held", "needs_fix"].includes(p.status)) throw new UserError("Work can only be submitted while payment is on hold.");
+    if (p.submissions.length >= MAX_SUBMISSIONS) throw new UserError("This pact has reached its delivery limit. Release or void the hold.");
 
     const form = await req.formData();
     const uploads = form.getAll("files").filter((f): f is File => f instanceof File);
@@ -24,20 +29,23 @@ export async function POST(req: Request, ctx: RouteContext<"/api/pacts/[id]/subm
     if (sample) {
       const set = SAMPLES[sample as keyof typeof SAMPLES];
       if (!set) throw new UserError("Unknown sample.");
-      const origin = new URL(req.url).origin;
+      // read from disk (bundled with the function), never over the network, so a forged Host header cannot redirect it
       for (const name of set) {
-        const res = await fetch(`${origin}/samples/${sample}/${name}`);
-        files.push({ name, mime: res.headers.get("content-type")?.split(";")[0] ?? "", bytes: Buffer.from(await res.arrayBuffer()) });
+        const bytes = await readFile(path.join(process.cwd(), "public", "samples", sample, name));
+        files.push({ name, mime: name.endsWith(".svg") ? "image/svg+xml" : "image/png", bytes });
       }
     } else {
       if (!uploads.length) throw new UserError("Add at least one file.");
       if (uploads.length > MAX_FILES) throw new UserError(`Up to ${MAX_FILES} files.`);
+      if (uploads.reduce((n, f) => n + f.size, 0) > MAX_TOTAL) throw new UserError("Files add up to more than 4 MB. Send fewer or smaller files.");
       for (const f of uploads) {
         if (f.size > MAX_BYTES) throw new UserError(`${f.name} is over 1.5 MB.`);
         if (!/^image\/(png|svg\+xml|jpeg|webp)$/.test(f.type)) throw new UserError(`${f.name}: only PNG, SVG, JPG or WEBP.`);
         files.push({ name: f.name.slice(0, 80), mime: f.type, bytes: Buffer.from(await f.arrayBuffer()) });
       }
     }
+
+    const v = await verify(p, files); // verify first: a failed AI call stores nothing
 
     const saved = [];
     for (const f of files) {
@@ -46,8 +54,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/pacts/[id]/subm
       saved.push({ id: fid, name: f.name, mime: f.mime });
     }
     log(p, { kind: "evidence", title: `Freelancer delivered ${files.length} file${files.length === 1 ? "" : "s"}`, detail: files.map((f) => f.name).join(", ") });
-
-    const v = await verify(p, files);
     p.submissions.push({ at: new Date().toISOString(), files: saved, ...v });
     const failed = v.results.filter((r) => !r.pass).length;
     p.status = v.pass ? "verified" : "needs_fix";

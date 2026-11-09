@@ -11,7 +11,12 @@ async function load(id: string) {
   if (!p) throw new UserError("Pact not found.");
   // Deadline passed with money still on hold: release it back to the client.
   if (p.deadline && Date.parse(p.deadline) < Date.now() && ["held", "needs_fix"].includes(p.status) && p.paypal.authorizationId) {
-    await paypal.voidHold(p.paypal.authorizationId);
+    try {
+      await paypal.voidHold(p.paypal.authorizationId);
+    } catch (e) {
+      console.error("auto-void failed", e); // keep the page usable; the client can still void by hand
+      return p;
+    }
     p.status = "voided";
     log(p, { kind: "paypal", title: "Deadline missed — hold voided", detail: "Funds released back to the client", ref: p.paypal.authorizationId });
     await savePact(p);

@@ -20,7 +20,7 @@ export async function getPact(id: string): Promise<Pact | null> {
   return (rows[0]?.data as Pact) ?? null;
 }
 
-// ponytail: last-write-wins on the whole document; one client drives a pact at a time in this demo.
+// Known limit: last-write-wins on the whole document; one client drives a pact at a time in this demo.
 export async function savePact(p: Pact) {
   await init();
   await sql`insert into pacts (id, data, updated_at) values (${p.id}, ${JSON.stringify(p)}, now())

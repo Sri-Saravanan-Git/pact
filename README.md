@@ -49,8 +49,6 @@ Every step is written to the pact's **flight log** with the PayPal ID that prove
 
 Rate limits and "high demand" errors from the free tier are retried once, then shown to the user as "AI busy, try again".
 
-**Built with Claude Code** (Anthropic) as the coding assistant.
-
 ## Tech stack
 
 Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Motion · three.js / react-three-fiber (3D x-ray security belt) · AG Grid Community (ledger) · Google Gemini (`@google/genai`) · PayPal REST APIs + JS SDK · sharp · Neon Postgres · Vercel.
