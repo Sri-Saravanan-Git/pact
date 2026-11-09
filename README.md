@@ -2,7 +2,7 @@
 
 **Pact is the trust layer between people, AI agents and money.** You tell Pact what you need in plain English. An AI agent buys it under limits it cannot break, PayPal holds the money with the freelancer already named as payee, and the payment is captured only when every promise is checked with evidence.
 
-- **Live demo:** _add your Vercel URL here_
+- **Live demo:** https://pact-three-red.vercel.app
 - **Demo video:** _add your YouTube link here_
 - Built for the [PayPal AI Hackathon 2026](https://paypalaihackathon.devpost.com/). PayPal **sandbox** only: no real money moves.
 
