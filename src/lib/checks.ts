@@ -60,7 +60,10 @@ export async function runCodeCheck(c: Criterion, files: InFile[]): Promise<Crite
 /** Render every image to a small PNG so the vision model can look at it (SVG included). */
 export async function previews(files: InFile[]) {
   const out: { name: string; b64: string }[] = [];
-  for (const f of files.slice(0, 6)) {
+  // Servers often have no fonts, so SVG text would rasterise as empty boxes and mislead the AI.
+  // When the delivery includes raster images (text already baked in), the AI looks at those.
+  const raster = files.filter((f) => !isSvg(f));
+  for (const f of (raster.length ? raster : files).slice(0, 6)) {
     const png = await sharp(f.bytes, { density: 144 })
       .resize(512, 512, { fit: "contain", background: { r: 255, g: 255, b: 255, alpha: 0 } })
       .png()
